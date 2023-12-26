@@ -1,16 +1,28 @@
 package com.auca.StudentRegistration.Model;
 
 import jakarta.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 
+/**
+ * Represents a teacher with details such as teacher ID, code, full names, email, phone number, and qualification.
+ */
 @Entity
 public class Teacher {
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int tr_id;
+
     private String tr_code;
     private String fullNames;
+
+    @Email(message = "Invalid email format")
     private String email;
+
+    @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
     private String phoneNbr;
+
     @Enumerated(EnumType.STRING)
     private Qualification qualification;
 
@@ -72,5 +84,19 @@ public class Teacher {
 
     public void setQualification(Qualification qualification) {
         this.qualification = qualification;
+    }
+
+    // Optional: Implement toString for human-readable representation
+
+    @Override
+    public String toString() {
+        return "Teacher{" +
+               "tr_id=" + tr_id +
+               ", tr_code='" + tr_code + '\'' +
+               ", fullNames='" + fullNames + '\'' +
+               ", email='" + email + '\'' +
+               ", phoneNbr='" + phoneNbr + '\'' +
+               ", qualification=" + qualification +
+               '}';
     }
 }
