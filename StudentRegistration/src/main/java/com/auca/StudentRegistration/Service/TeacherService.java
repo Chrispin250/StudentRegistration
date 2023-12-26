@@ -1,79 +1,98 @@
 package com.auca.StudentRegistration.Service;
 
+import com.auca.StudentRegistration.Model.AcademicUnit;
+import com.auca.StudentRegistration.Model.Semester;
 import com.auca.StudentRegistration.Model.Student;
-import com.auca.StudentRegistration.Model.Teacher;
+import com.auca.StudentRegistration.Model.StudentRegistration;
+import com.auca.StudentRegistration.Repository.StudentRegistrationRepo;
 import com.auca.StudentRegistration.Repository.StudentRepo;
-import com.auca.StudentRegistration.Repository.TeacherRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-public class TeacherService {
-    private static final Logger logger = LoggerFactory.getLogger(TeacherService.class);
+public class StudentService {
+    private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     @Autowired
-    private TeacherRepo teacherRepo;
-    public String saveTeacher(Teacher teacher){
-        if (teacher != null) {
-            if (isTeacherExists(teacher.getTr_code())) {
-                return "Teacher already exists";
+    private StudentRepo studRepo;
+    @Autowired
+    private StudentRegistrationRepo regRepo;
+
+    @Transactional
+    public String createStudent(Student student) {
+        if (student != null) {
+            if (isStudentExists(student.getRegistrationNumber())) {
+                return "Student with the same registration number already exists";
             } else {
-                teacherRepo.save(teacher);
-                return "Teacher created successfully";
+                studRepo.save(student);
+                return "Student created successfully";
             }
         } else {
-            return null;
+            return "Invalid input: Student is null";
         }
     }
-    public boolean isTeacherExists(String tr_code) {
-        return teacherRepo.existsById(tr_code);
+
+    public boolean isStudentExists(String registrationNumber) {
+        return studRepo.existsById(registrationNumber);
     }
 
-    public List<Teacher> listTeacher() {
-        return teacherRepo.findAll();
+    public List<Student> listStudents() {
+        return studRepo.findAll();
     }
 
-    public String updateTeacher(String tr_code, Teacher teacher) {
-        logger.info("Updating teacher with code: {}", tr_code);
+    @Transactional
+    public String updateStudent(String registrationNumber, Student student) {
+        logger.info("Updating student with registration number: {}", registrationNumber);
         try {
-            if (teacher != null) {
-                if (isTeacherExists(tr_code)) {
-                    teacherRepo.save(teacher);
-                    logger.info("Teacher updated successfully");
-                    return "Teacher updated successfully";
+            if (student != null) {
+                if (isStudentExists(registrationNumber)) {
+                    studRepo.save(student);
+                    logger.info("Student updated successfully");
+                    return "Student updated successfully";
                 } else {
-                    return "Teacher not found";
+                    return "Student not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Updated student is null";
             }
-        }catch (Exception ex){
-            logger.error("Failed to update Teacher", ex);
-            return "Teacher not updated successfully";
+        } catch (Exception ex) {
+            logger.error("Failed to update student. Exception: {}", ex.getMessage());
+            return "Student not updated successfully";
         }
     }
 
-    public String deleteTeacher(String tr_code) {
-        logger.info("Deleting Teacher with code: {}", tr_code);
+    @Transactional
+    public String deleteStudent(String registrationNumber) {
+        logger.info("Deleting student with registration number: {}", registrationNumber);
         try {
-            if (tr_code != null) {
-                if (isTeacherExists(tr_code)) {
-                    teacherRepo.deleteById(tr_code);
-                    logger.info("Teacher deleted successfully");
-                    return "Teacher deleted successfully";
+            if (registrationNumber != null) {
+                if (isStudentExists(registrationNumber)) {
+                    studRepo.deleteById(registrationNumber);
+                    logger.info("Student deleted successfully");
+                    return "Student deleted successfully";
                 } else {
-                    return "Teacher not found";
+                    return "Student not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Registration number is null";
             }
         } catch (Exception e) {
-            logger.error("Failed to delete Teacher", e);
-            return "Teacher not deleted";
+            logger.error("Failed to delete student. Exception: {}", e.getMessage());
+            return "Student not deleted successfully";
         }
+    }
+
+    public List<StudentRegistration> getStudentsBySemester(Semester semester) {
+        logger.info("Student in Semester: {}", semester);
+        return regRepo.findBySemester(semester);
+    }
+
+    public List<StudentRegistration> getStudentsByDepartmentAndSemester(AcademicUnit department, Semester semester) {
+        return regRepo.findByDepartmentAndSemester(department, semester);
     }
 }
