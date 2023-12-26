@@ -1,18 +1,26 @@
 package com.auca.StudentRegistration.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 
+/**
+ * Represents a course offered by an academic unit in a specific semester.
+ * This class is used to model courses and their relationships with other entities.
+ */
 @Entity
 public class Course {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne
     @JoinColumn(name = "academic_unit_code")
+    @NotNull(message = "Department cannot be null")
     private AcademicUnit department;
 
     @OneToMany(mappedBy = "course")
@@ -21,60 +29,41 @@ public class Course {
 
     @ManyToOne
     @JoinColumn(name = "course_definition_id")
+    @NotNull(message = "Course definition cannot be null")
     private CourseDefinition courseDefinition;
 
     @ManyToOne
     @JoinColumn(name = "semester_id")
+    @NotNull(message = "Semester cannot be null")
     private Semester semester;
 
-    public Course() {
+    // Getters and setters
+
+    // Optional: Implement equals and hashCode for object comparison
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Course course = (Course) o;
+        return id == course.id;
     }
 
-    public Course(int id, AcademicUnit department, List<StudentCourse> studentCourses, CourseDefinition courseDefinition, Semester semester) {
-        this.id = id;
-        this.department = department;
-        this.studentCourses = studentCourses;
-        this.courseDefinition = courseDefinition;
-        this.semester = semester;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
-    public int getId() {
-        return id;
-    }
+    // Optional: Implement toString for human-readable representation
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public AcademicUnit getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(AcademicUnit department) {
-        this.department = department;
-    }
-
-    public List<StudentCourse> getStudentCourses() {
-        return studentCourses;
-    }
-
-    public void setStudentCourses(List<StudentCourse> studentCourses) {
-        this.studentCourses = studentCourses;
-    }
-
-    public CourseDefinition getCourseDefinition() {
-        return courseDefinition;
-    }
-
-    public void setCourseDefinition(CourseDefinition courseDefinition) {
-        this.courseDefinition = courseDefinition;
-    }
-
-    public Semester getSemester() {
-        return semester;
-    }
-
-    public void setSemester(Semester semester) {
-        this.semester = semester;
+    @Override
+    public String toString() {
+        return "Course{" +
+               "id=" + id +
+               ", department=" + department +
+               ", studentCourses=" + studentCourses +
+               ", courseDefinition=" + courseDefinition +
+               ", semester=" + semester +
+               '}';
     }
 }
