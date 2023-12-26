@@ -1,7 +1,7 @@
 package com.auca.StudentRegistration.Model;
 
-public enum EAcademicUnit{
-        Programme,
-        Faculty,
-        Department
+public enum EAcademicUnit {
+    PROGRAMME,
+    FACULTY,
+    DEPARTMENT
 }
