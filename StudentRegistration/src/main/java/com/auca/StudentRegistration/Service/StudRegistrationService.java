@@ -1,7 +1,6 @@
 package com.auca.StudentRegistration.Service;
 
 import com.auca.StudentRegistration.Model.AcademicUnit;
-import com.auca.StudentRegistration.Model.Course;
 import com.auca.StudentRegistration.Model.Semester;
 import com.auca.StudentRegistration.Model.StudentRegistration;
 import com.auca.StudentRegistration.Repository.StudentRegistrationRepo;
@@ -9,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,30 +18,35 @@ public class StudRegistrationService {
 
     @Autowired
     private StudentRegistrationRepo regRepo;
-    public String saveRegistration(StudentRegistration studRegistration) {
+
+    @Transactional
+    public String createRegistration(StudentRegistration studRegistration) {
         if (studRegistration != null) {
             if (regRepo.existsByStudentId(studRegistration.getStudentId())) {
                 return "Student with ID " + studRegistration.getStudentId() + " is already registered.";
             } else {
-                // Save the registration if not already present
                 regRepo.save(studRegistration);
                 return "Student Registration created successfully";
             }
         } else {
-            return null;
+            return "Invalid input: StudentRegistration is null";
         }
     }
+
     public boolean isRegistrationExists(AcademicUnit department, Semester semester) {
         return regRepo.existsByDepartmentAndSemester(department, semester);
     }
+
     public boolean isStudentRegExists(Integer id) {
         return regRepo.existsById(id);
     }
+
     public List<StudentRegistration> listStudentsReg() {
         return regRepo.findAll();
     }
 
-    public String updateStudentReg(Integer id, StudentRegistration studReg) {
+    @Transactional
+    public String updateRegistration(Integer id, StudentRegistration studReg) {
         logger.info("Updating student registration with id: {}", id);
         try {
             if (studReg != null) {
@@ -53,16 +58,17 @@ public class StudRegistrationService {
                     return "Student Registration not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Updated studentRegistration is null";
             }
-        }catch (Exception ex){
-            logger.error("Failed to update student Registration", ex);
+        } catch (Exception ex) {
+            logger.error("Failed to update student Registration. Exception: {}", ex.getMessage());
             return "Student Registration not updated";
         }
     }
 
-    public String deleteStudentReg(Integer id) {
-        logger.info("Deleting student with id: {}", id);
+    @Transactional
+    public String deleteRegistration(Integer id) {
+        logger.info("Deleting student registration with id: {}", id);
         try {
             if (id != null) {
                 if (isStudentRegExists(id)) {
@@ -73,25 +79,30 @@ public class StudRegistrationService {
                     return "Student Registration not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Id is null";
             }
         } catch (Exception e) {
-            logger.error("Failed to delete student Registration", e);
+            logger.error("Failed to delete student Registration. Exception: {}", e.getMessage());
             return "Student Registration not deleted successfully";
         }
     }
+
     public List<StudentRegistration> getRegistrationsByDepartmentAndSemester(AcademicUnit department, Semester semester) {
         return regRepo.findByDepartmentAndSemester(department, semester);
     }
+
     public List<StudentRegistration> getRegistrationsBySemester(Semester semester) {
         return regRepo.findBySemester(semester);
     }
+
     public StudentRegistration getRegistrationBySemesterId(String semesterId) {
         return regRepo.findByStudentId(semesterId);
     }
+
     public StudentRegistration getRegistrationByStudentId(String studentId) {
         return regRepo.findByStudentId(studentId);
     }
+
     public StudentRegistration getRegistrationById(Integer id) {
         return regRepo.findById(id).orElse(null);
     }
