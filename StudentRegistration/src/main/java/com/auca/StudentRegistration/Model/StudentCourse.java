@@ -3,15 +3,25 @@ package com.auca.StudentRegistration.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
+/**
+ * Represents a record of a student's course, including credits, results,
+ * associated student registration, and course.
+ */
 @Entity
 public class StudentCourse {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Min(value = 0, message = "Credits cannot be negative")
     private int credits;
+
+    @DecimalMin(value = "0.0", inclusive = false, message = "Results cannot be negative")
     private BigDecimal results;
 
     @ManyToOne
@@ -71,5 +81,18 @@ public class StudentCourse {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    // Optional: Implement toString for human-readable representation
+
+    @Override
+    public String toString() {
+        return "StudentCourse{" +
+               "id=" + id +
+               ", credits=" + credits +
+               ", results=" + results +
+               ", studentRegistration=" + studentRegistration +
+               ", course=" + course +
+               '}';
     }
 }
