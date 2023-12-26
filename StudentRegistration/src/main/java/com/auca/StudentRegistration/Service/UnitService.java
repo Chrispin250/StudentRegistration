@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,7 +16,9 @@ public class UnitService {
 
     @Autowired
     private UnitRepo unitRepo;
-    public String saveUnit(AcademicUnit acadUnit){
+
+    @Transactional
+    public String createUnit(AcademicUnit acadUnit) {
         if (acadUnit != null) {
             if (isAcadExists(acadUnit.getCode())) {
                 return "Unit already exists";
@@ -24,9 +27,10 @@ public class UnitService {
                 return "Unit created successfully";
             }
         } else {
-            return null;
+            return "Invalid input: AcademicUnit is null";
         }
     }
+
     public boolean isAcadExists(String code) {
         return unitRepo.existsById(code);
     }
@@ -35,6 +39,7 @@ public class UnitService {
         return unitRepo.findAll();
     }
 
+    @Transactional
     public String updateUnit(String code, AcademicUnit acadUnit) {
         logger.info("Updating Unit with code: {}", code);
         try {
@@ -47,14 +52,15 @@ public class UnitService {
                     return "Unit not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Updated AcademicUnit is null";
             }
-        }catch (Exception ex){
-            logger.error("Failed to update Unit", ex);
+        } catch (Exception ex) {
+            logger.error("Failed to update Unit. Exception: {}", ex.getMessage());
             return "Unit not updated";
         }
     }
 
+    @Transactional
     public String deleteUnit(String code) {
         logger.info("Deleting unit with code: {}", code);
         try {
@@ -67,13 +73,14 @@ public class UnitService {
                     return "Unit not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Code is null";
             }
         } catch (Exception e) {
-            logger.error("Failed to delete Unit", e);
+            logger.error("Failed to delete Unit. Exception: {}", e.getMessage());
             return "Unit not deleted";
         }
     }
+
     public AcademicUnit getAcademicUnitByCode(String code) {
         return unitRepo.findById(code).orElse(null);
     }
