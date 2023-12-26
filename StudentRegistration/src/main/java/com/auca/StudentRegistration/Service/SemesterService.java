@@ -1,9 +1,7 @@
 package com.auca.StudentRegistration.Service;
 
 import com.auca.StudentRegistration.Model.Semester;
-import com.auca.StudentRegistration.Model.Student;
 import com.auca.StudentRegistration.Repository.SemesterRepo;
-import com.auca.StudentRegistration.Repository.StudentRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,42 +15,44 @@ public class SemesterService {
 
     @Autowired
     private SemesterRepo semRepo;
-    public String saveSemester(Semester semester){
+
+    public String createSemester(Semester semester) {
         if (semester != null) {
-            if (isSemesterExists(semester.getId())) {
+            if (semesterExists(semester.getId())) {
                 return "Semester already exists";
             } else {
                 semRepo.save(semester);
-                return "semester created successfully";
+                return "Semester created successfully";
             }
         } else {
-            return null;
+            return "Invalid input: Semester is null";
         }
     }
-    public boolean isSemesterExists(String id) {
-        return semRepo.existsById(id);
+
+    public boolean semesterExists(String id) {
+        return id != null && semRepo.existsById(id);
     }
 
     public List<Semester> listSemesters() {
         return semRepo.findAll();
     }
 
-    public String updateSemester(String id, Semester semester) {
+    public String updateSemester(String id, Semester updatedSemester) {
         logger.info("Updating semester with id: {}", id);
         try {
-            if (semester != null) {
-                if (isSemesterExists(id)) {
-                    semRepo.save(semester);
+            if (updatedSemester != null) {
+                if (semesterExists(id)) {
+                    semRepo.save(updatedSemester);
                     logger.info("Semester updated successfully");
                     return "Semester updated successfully";
                 } else {
                     return "Semester not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Updated semester is null";
             }
-        }catch (Exception ex){
-            logger.error("Failed to update Semester", ex);
+        } catch (Exception ex) {
+            logger.error("Failed to update Semester. Exception: {}", ex.getMessage());
             return "Semester not updated";
         }
     }
@@ -61,7 +61,7 @@ public class SemesterService {
         logger.info("Deleting Semester with id: {}", id);
         try {
             if (id != null) {
-                if (isSemesterExists(id)) {
+                if (semesterExists(id)) {
                     semRepo.deleteById(id);
                     logger.info("Semester deleted successfully");
                     return "Semester deleted successfully";
@@ -69,15 +69,16 @@ public class SemesterService {
                     return "Semester not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Semester id is null";
             }
         } catch (Exception e) {
-            logger.error("Failed to delete Semester", e);
+            logger.error("Failed to delete Semester. Exception: {}", e.getMessage());
             return "Semester not deleted";
         }
     }
+
     public Semester getSemesterById(String id) {
-        logger.info("Semester with id: {}", id);
+        logger.info("Getting Semester with id: {}", id);
         return semRepo.findById(id).orElse(null);
     }
 }
