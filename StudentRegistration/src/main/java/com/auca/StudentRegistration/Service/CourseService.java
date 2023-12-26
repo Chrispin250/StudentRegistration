@@ -1,115 +1,95 @@
-package com.auca.StudentRegistration.Service;
+package com.example.StudentManagementSystem.Service;
 
-import com.auca.StudentRegistration.Model.AcademicUnit;
-import com.auca.StudentRegistration.Model.Course;
-import com.auca.StudentRegistration.Model.CourseDefinition;
-import com.auca.StudentRegistration.Model.Semester;
-import com.auca.StudentRegistration.Repository.CourseDefRepo;
-import com.auca.StudentRegistration.Repository.CourseRepo;
+import com.example.StudentManagementSystem.Model.*;
+import com.example.StudentManagementSystem.Repository.CourseDefRepository;
+import com.example.StudentManagementSystem.Repository.CourseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
-public class CourseService {
-    private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
+public class CustomCourseService {
+    private static final Logger logger = LoggerFactory.getLogger(CustomCourseService.class);
 
     @Autowired
-    private CourseRepo crsRepo;
+    private CourseRepository customCourseRepository;
     @Autowired
-    private CourseDefRepo crsDefRepo;
-    public String saveCourse(Course course) {
-        if (course != null) {
-            if (isCourseExists(course.getDepartment(), course.getSemester())) {
-                return "Course already exists in the department and semester.";
+    private CourseDefRepository customCourseDefRepository;
+
+    public String saveCustomCourse(CustomCourse customCourse) {
+        if (customCourse != null) {
+            if (isCustomCourseExists(customCourse.getDepartment(), customCourse.getSemester())) {
+                return "Custom Course already exists in the department and semester.";
             } else {
-                crsRepo.save(course);
-                return "Course created successfully.";
+                customCourseRepository.save(customCourse);
+                return "Custom Course created successfully.";
             }
         } else {
             return null;
         }
     }
 
-    public boolean isCourseExists(AcademicUnit department, Semester semester) {
-        return crsRepo.existsByDepartmentAndSemester(department, semester);
-    }
-    public boolean isCourseIdExists(Integer id) {
-        return crsRepo.existsById(id);
-    }
-    public List<Course> listCourses() {
-        return crsRepo.findAll();
-    }
-    public Course getCourseById(Integer id) {
-        logger.info("Course with id: {}", id);
-        return crsRepo.findById(id).orElse(null);
+    public boolean isCustomCourseExists(AcademicUnit department, Semester semester) {
+        return customCourseRepository.existsByDepartmentAndSemester(department, semester);
     }
 
-    public String updateCourse(CourseDefinition crsDef, Course course) {
-        logger.info("Updating Course with Code: {}", crsDef);
+    public List<CustomCourse> listCustomCourses() {
+        return customCourseRepository.findAll();
+    }
+
+    public CustomCourse getCustomCourseById(Integer id) {
+        logger.info("Custom Course with id: {}", id);
+        return customCourseRepository.findById(id).orElse(null);
+    }
+
+    public String updateCustomCourse(CourseDefinition customCourseDef, CustomCourse customCourse) {
+        logger.info("Updating Custom Course with Code: {}", customCourseDef);
         try {
-            if (course != null) {
-                if (isCourseDefinitionExists(crsDef)) {
-                    crsRepo.save(course);
-                    logger.info("Course updated successfully");
-                    return "Course updated successfully";
+            if (customCourse != null) {
+                if (isCustomCourseDefinitionExists(customCourseDef)) {
+                    customCourseRepository.save(customCourse);
+                    logger.info("Custom Course updated successfully");
+                    return "Custom Course updated successfully";
                 } else {
-                    return "Course not found";
+                    return "Custom Course not found";
                 }
             } else {
                 return "Invalid input";
             }
-        }catch (Exception ex){
-            logger.error("Failed to Course student", ex);
-            return "Course not updated";
+        } catch (Exception ex) {
+            logger.error("Failed to update Custom Course", ex);
+            return "Custom Course not updated";
         }
     }
-    /*public String updateCourse(Integer id, Course course) {
-        logger.info("Updating Course with Id: {}", id);
-        try {
-            if (course != null) {
-                if (isCourseIdExists(id)) {
-                    crsRepo.save(course);
-                    logger.info("Course updated successfully");
-                    return "Course updated successfully";
-                } else {
-                    return "Course not found";
-                }
-            } else {
-                return "Invalid input";
-            }
-        }catch (Exception ex){
-            logger.error("Failed to Course student", ex);
-            return "Course not updated";
-        }
-    }*/
 
-    public boolean isCourseDefinitionExists(CourseDefinition courseDefinition) {
-        return crsRepo.existsByCourseDefinition(courseDefinition);
+    public boolean isCustomCourseDefinitionExists(CourseDefinition customCourseDefinition) {
+        return customCourseRepository.existsByCourseDefinition(customCourseDefinition);
     }
 
-    public String deleteCourse(Integer id) {
-        logger.info("Deleting Course with id: {}", id);
+    public String deleteCustomCourse(Integer id) {
+        logger.info("Deleting Custom Course with id: {}", id);
         try {
             if (id != null) {
-                if (isCourseIdExists(id)) {
-                    crsRepo.deleteById(id);
-                    logger.info("Course deleted successfully");
-                    return "Course deleted successfully";
+                if (isCustomCourseIdExists(id)) {
+                    customCourseRepository.deleteById(id);
+                    logger.info("Custom Course deleted successfully");
+                    return "Custom Course deleted successfully";
                 } else {
-                    return "Course not found";
+                    return "Custom Course not found";
                 }
             } else {
                 return "Invalid input";
             }
         } catch (Exception e) {
-            logger.error("Failed to delete Course", e);
-            return "Course was not deleted successfully";
+            logger.error("Failed to delete Custom Course", e);
+            return "Custom Course was not deleted successfully";
         }
     }
-    public List<Course> getCoursesByDepartmentAndSemester(AcademicUnit department, Semester semester) {
-        return crsRepo.findByDepartmentAndSemester(department, semester);
+
+    public List<CustomCourse> getCustomCoursesByDepartmentAndSemester(AcademicUnit department, Semester semester) {
+        return customCourseRepository.findByDepartmentAndSemester(department, semester);
     }
 }
