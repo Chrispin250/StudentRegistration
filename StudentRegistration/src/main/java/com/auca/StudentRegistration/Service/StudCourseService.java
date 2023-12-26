@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,12 @@ public class StudCourseService {
 
     @Autowired
     private StudentCourseRepo studCrsRepo;
+
     @Autowired
     private StudentRegistrationRepo regRepo;
-    public String saveStudCourse(StudentCourse studentCourse) {
+
+    @Transactional
+    public String createStudCourse(StudentCourse studentCourse) {
         if (studentCourse != null) {
             if (isCourseRegistered(studentCourse.getCourse())) {
                 return "Course is already registered by a student.";
@@ -29,15 +33,18 @@ public class StudCourseService {
                 return "Course registered successfully.";
             }
         } else {
-            return null;
+            return "Invalid input: StudentCourse is null";
         }
     }
+
     public boolean isCourseRegistered(Course course) {
         return studCrsRepo.existsByCourse(course);
     }
+
     public boolean isStudentExists(String studentId) {
         return regRepo.existsByStudentId(studentId);
     }
+
     public boolean isStudentCrsExists(Integer id) {
         return studCrsRepo.existsById(id);
     }
@@ -46,25 +53,7 @@ public class StudCourseService {
         return studCrsRepo.findAll();
     }
 
-    /*public String updateStudCourse(String studentId, Course course,StudentCourse studentCourse) {
-        logger.info("Updating student with student ID: {} and Course: {}", studentId,course);
-        try {
-            if (studentCourse != null) {
-                if (isStudentExists(studentId) && isCourseRegistered(course)) {
-                    studCrsRepo.save(studentCourse);
-                    logger.info("Student Course updated successfully");
-                    return "Student Course updated successfully";
-                } else {
-                    return "Student not found";
-                }
-            } else {
-                return "Invalid input";
-            }
-        }catch (Exception ex){
-            logger.error("Failed to update student Course", ex);
-            return "Student Course not updated";
-        }
-    }*/
+    @Transactional
     public String updateStudCourse(Integer id, StudentCourse studentCourse) {
         logger.info("Updating student with student ID: {}", id);
         try {
@@ -74,17 +63,18 @@ public class StudCourseService {
                     logger.info("Student Course updated successfully");
                     return "Student Course updated successfully";
                 } else {
-                    return "Student not found";
+                    return "Student Course not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Updated studentCourse is null";
             }
-        }catch (Exception ex){
-            logger.error("Failed to update student Course", ex);
+        } catch (Exception ex) {
+            logger.error("Failed to update student Course. Exception: {}", ex.getMessage());
             return "Student Course not updated";
         }
     }
 
+    @Transactional
     public String deleteStudCourse(Integer id) {
         logger.info("Deleting student course with id: {}", id);
         try {
@@ -97,24 +87,19 @@ public class StudCourseService {
                     return "Student Course not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Id is null";
             }
         } catch (Exception e) {
-            logger.error("Failed to delete student Course", e);
+            logger.error("Failed to delete student Course. Exception: {}", e.getMessage());
             return "Student Course not deleted";
         }
     }
-    public List<StudentCourse> getCoursesByStudent(String studentId) {
-        StudentRegistration student = studentRegistrationRepo.findByStudentId(studentId);
-        return studCrsRepo.findByStudentRegistration(student);
-    }
-    @Autowired
-    private StudentRegistrationRepo studentRegistrationRepo;
 
     public List<StudentCourse> getCoursesByStudentId(String studentId) {
         StudentRegistration student = regRepo.findByStudentId(studentId);
         return studCrsRepo.findByStudentRegistration(student);
     }
+
     public List<StudentCourse> getStudentByCourseAndSemester(Course course, String semester) {
         List<StudentRegistration> students = regRepo.findBySemesterId(semester);
         List<StudentCourse> result = new ArrayList<>();
@@ -124,6 +109,4 @@ public class StudCourseService {
         }
         return result;
     }
-
-
 }
