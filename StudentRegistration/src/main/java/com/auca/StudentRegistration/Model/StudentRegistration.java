@@ -1,26 +1,30 @@
 package com.auca.StudentRegistration.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Represents a student registration record, including the student, registration date, associated department, semester,
+ * courses, and the corresponding student registration ID.
+ */
 @Entity
 public class StudentRegistration {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(name = "student_id")
+
+    @Size(max = 255, message = "Student ID must be at most 255 characters")
+    @Column(name = "student_id", length = 255)
     private String studentId;
+
+    @NotNull(message = "Registration date cannot be null")
+    @Past(message = "Registration date must be in the past")
     private LocalDate registrationDate;
 
     @ManyToOne
@@ -106,5 +110,19 @@ public class StudentRegistration {
 
     public void setStudent(Student student) {
         this.student = student;
+    }
+
+    // Optional: Implement toString for human-readable representation
+
+    @Override
+    public String toString() {
+        return "StudentRegistration{" +
+               "id=" + id +
+               ", studentId='" + studentId + '\'' +
+               ", registrationDate=" + registrationDate +
+               ", department=" + department +
+               ", semester=" + semester +
+               ", student=" + student +
+               '}';
     }
 }
