@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 public class CourseDefService {
     private static final Logger logger = LoggerFactory.getLogger(CourseDefService.class);
 
     @Autowired
     private CourseDefRepo defRepo;
+
     public String saveDef(CourseDefinition courseDefinition){
         if (courseDefinition != null) {
             if (isDefExists(courseDefinition.getCode())) {
@@ -26,6 +28,7 @@ public class CourseDefService {
             return null;
         }
     }
+
     public boolean isDefExists(String code) {
         return defRepo.existsById(code);
     }
@@ -48,7 +51,7 @@ public class CourseDefService {
             } else {
                 return "Invalid input";
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             logger.error("Failed to update Course", ex);
             return "Course not updated";
         }
@@ -57,19 +60,15 @@ public class CourseDefService {
     public String deleteDef(String code) {
         logger.info("Deleting course with code: {}", code);
         try {
-            if (code != null) {
-                if (isDefExists(code)) {
-                    defRepo.deleteById(code);
-                    logger.info("Course deleted successfully");
-                    return "Course deleted successfully";
-                } else {
-                    return "Course not found";
-                }
+            if (isDefExists(code)) {
+                defRepo.deleteById(code);
+                logger.info("Course deleted successfully");
+                return "Course deleted successfully";
             } else {
-                return "Invalid input";
+                return "Course not found";
             }
-        } catch (Exception e) {
-            logger.error("Failed to delete course", e);
+        } catch (Exception ex) {
+            logger.error("Failed to delete Course", ex);
             return "Course not deleted";
         }
     }
