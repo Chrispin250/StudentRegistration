@@ -1,9 +1,9 @@
-package com.auca.StudentRegistration.Repository;
+package com.example.StudentManagementSystem.Repository;
 
-import com.auca.StudentRegistration.Model.Semester;
+import com.example.StudentManagementSystem.Model.AcademicTerm;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SemesterRepo extends JpaRepository<Semester, String> {
+public interface CustomSemesterRepository extends JpaRepository<AcademicTerm, String> {
 }
