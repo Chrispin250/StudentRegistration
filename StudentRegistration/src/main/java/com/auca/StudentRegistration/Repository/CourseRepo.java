@@ -12,7 +12,6 @@ import java.util.List;
 @Repository
 public interface CourseRepo extends JpaRepository<Course, Integer> {
     boolean existsByDepartmentAndSemester(AcademicUnit department, Semester semester);
-    public boolean existsByCourseDefinition(CourseDefinition courseDefinition);
+    boolean existsByCourseDefinition(CourseDefinition courseDefinition);
     List<Course> findByDepartmentAndSemester(AcademicUnit department, Semester semester);
-
 }
