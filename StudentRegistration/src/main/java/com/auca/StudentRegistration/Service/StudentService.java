@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,9 +23,9 @@ public class StudentService {
     @Autowired
     private StudentRegistrationRepo regRepo;
 
-    public String saveStudent(Student student){
+    @Transactional
+    public String createStudent(Student student) {
         if (student != null) {
-            // Check if a student with the same registration number already exists
             if (isStudentExists(student.getRegistrationNumber())) {
                 return "Student with the same registration number already exists";
             } else {
@@ -32,9 +33,10 @@ public class StudentService {
                 return "Student created successfully";
             }
         } else {
-            return null;
+            return "Invalid input: Student is null";
         }
     }
+
     public boolean isStudentExists(String registrationNumber) {
         return studRepo.existsById(registrationNumber);
     }
@@ -43,12 +45,12 @@ public class StudentService {
         return studRepo.findAll();
     }
 
+    @Transactional
     public String updateStudent(String registrationNumber, Student student) {
         logger.info("Updating student with registration number: {}", registrationNumber);
         try {
             if (student != null) {
                 if (isStudentExists(registrationNumber)) {
-                    // Update the student information here
                     studRepo.save(student);
                     logger.info("Student updated successfully");
                     return "Student updated successfully";
@@ -56,14 +58,15 @@ public class StudentService {
                     return "Student not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Updated student is null";
             }
-        }catch (Exception ex){
-            logger.error("Failed to update student", ex);
+        } catch (Exception ex) {
+            logger.error("Failed to update student. Exception: {}", ex.getMessage());
             return "Student not updated successfully";
         }
     }
 
+    @Transactional
     public String deleteStudent(String registrationNumber) {
         logger.info("Deleting student with registration number: {}", registrationNumber);
         try {
@@ -76,17 +79,19 @@ public class StudentService {
                     return "Student not found";
                 }
             } else {
-                return "Invalid input";
+                return "Invalid input: Registration number is null";
             }
         } catch (Exception e) {
-            logger.error("Failed to delete student", e);
+            logger.error("Failed to delete student. Exception: {}", e.getMessage());
             return "Student not deleted successfully";
         }
     }
+
     public List<StudentRegistration> getStudentsBySemester(Semester semester) {
         logger.info("Student in Semester: {}", semester);
         return regRepo.findBySemester(semester);
     }
+
     public List<StudentRegistration> getStudentsByDepartmentAndSemester(AcademicUnit department, Semester semester) {
         return regRepo.findByDepartmentAndSemester(department, semester);
     }
